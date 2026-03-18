@@ -9,13 +9,12 @@ experiments:
     community_detection:
       algorithm: "louvain"
 
-  - name: "nclusterbox High Noise"
+  - name: "Louvain High Noise"
     ground_truth_generation:
-      random_seed: 7
-      number_of_vertices: 100
-      number_of_ground_truth_communities: 2
+      random_seed: 42
+      number_of_vertices: 200
+      number_of_ground_truth_communities: 4
     noise_injection:
-      number_of_correct_observations: 1.0
+      number_of_correct_observations: 0.01
     community_detection:
-      algorithm: "nclusterbox"
-      timeout: 30
+      algorithm: "louvain"
