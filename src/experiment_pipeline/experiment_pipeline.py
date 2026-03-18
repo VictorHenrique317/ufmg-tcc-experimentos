@@ -1,12 +1,24 @@
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any
+from dataclasses import dataclass
 import networkx as nx
+
+from src.experiment_pipeline.steps.pipeline_step import PipelineStep
+
+
+@dataclass
+class PipelineContext:
+    """
+    Contexto executado através do pipeline, passado de step para step.
+    """
+    name: str
+
 
 class ExperimentPipeline:
     """
     O executor do Pipeline. Apenas itera sobre os passos.
     """
-    def __init__(self, name: str, steps: List[BaseStep]):
+    def __init__(self, name: str, steps: List[PipelineStep]):
         self.name = name
         self.steps = steps
 
@@ -15,7 +27,7 @@ class ExperimentPipeline:
         context = PipelineContext(self.name)
         
         for step in self.steps:
-            context = step.process(context)
+            context = step.run(context)
             
         print(f"Pipeline '{self.name}' concluído com sucesso!")
         return context

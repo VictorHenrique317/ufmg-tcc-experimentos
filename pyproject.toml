@@ -8,6 +8,9 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "networkx>=3.0",
+    "numpy>=1.20",
+    "scipy>=1.7"
 ]
 
 

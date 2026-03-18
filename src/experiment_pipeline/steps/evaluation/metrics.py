@@ -1,7 +1,7 @@
 import numpy as np
 from typing import List, Set, Dict, Any
 
-from src.experiment_pipeline.shared.pipeline_step import PipelineStep
+from src.experiment_pipeline.steps.pipeline_step import PipelineStep
 
 class MetricsStep(PipelineStep):
     def __init__(self, ground_truth: List[Set[int]]):
@@ -73,7 +73,7 @@ class MetricsStep(PipelineStep):
         # Responde a: "Das comunidades que o algoritmo sugeriu, quão reais são elas?"
         det_to_gt_scores = []
         for det_comm in detected:
-            best_score = max((jaccard_index(det_comm, gt_comm) for gt_comm in ground_truth), default=0.0)
+            best_score = max((self.jaccard_index(det_comm, gt_comm) for gt_comm in ground_truth), default=0.0)
             det_to_gt_scores.append(best_score)
             
         mean_det_to_gt = np.mean(det_to_gt_scores)
@@ -82,7 +82,7 @@ class MetricsStep(PipelineStep):
         # Responde a: "Das comunidades que sabemos que existem, o algoritmo encontrou-as?"
         gt_to_det_scores = []
         for gt_comm in ground_truth:
-            best_score = max((jaccard_index(gt_comm, det_comm) for det_comm in detected), default=0.0)
+            best_score = max((self.jaccard_index(gt_comm, det_comm) for det_comm in detected), default=0.0)
             gt_to_det_scores.append(best_score)
             
         mean_gt_to_det = np.mean(gt_to_det_scores)

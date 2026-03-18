@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import networkx as nx
 from typing import List, Set
 
-from src.experiment_pipeline.shared.pipeline_step import PipelineStep
+from src.experiment_pipeline.steps.pipeline_step import PipelineStep
 
 class BaseDetector(PipelineStep):
     """

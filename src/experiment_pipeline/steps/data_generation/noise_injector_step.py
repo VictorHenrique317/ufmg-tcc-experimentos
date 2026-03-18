@@ -1,7 +1,7 @@
 import networkx as nx
 import numpy as np
 from scipy.stats import beta
-from src.experiment_pipeline.shared.pipeline_step import PipelineStep
+from src.experiment_pipeline.steps.pipeline_step import PipelineStep
 
 class NoiseInjectorStep(PipelineStep):
     def __init__(self, alpha: float = 4.0, beta_param: float = 2.0, random_state: int = None):

@@ -1,12 +1,18 @@
+from typing import List
+
+from src.experiment_pipeline.steps.pipeline_step import PipelineStep
+from src.experiment_pipeline.experiment_pipeline import ExperimentPipeline
+
+
 class ExperimentPipelineBuilder:
     """
     Construtor que permite acoplar os Steps na ordem desejada.
     """
     def __init__(self, name: str):
         self.name = name
-        self.steps: List[BaseStep] = []
+        self.steps: List[PipelineStep] = []
 
-    def add_step(self, step: BaseStep) -> 'PipelineBuilder':
+    def add_step(self, step: PipelineStep) -> 'ExperimentPipelineBuilder':
         self.steps.append(step)
         return self
 
