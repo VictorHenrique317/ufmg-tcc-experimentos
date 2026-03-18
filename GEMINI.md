@@ -26,13 +26,14 @@ poc/
 ├── src/
 │   ├── experiment_configuration/
 │   │   └── configuration_reader.py # Orquestração via YAML
-│   └── experiment_pipeline/
-│       ├── steps/           # Implementações de PipelineStep
-│       ├── experiment_pipeline.py
-│       └── experiment_state.py # Objeto central de dados e config
+│   ├── experiment_pipeline/
+│   │   ├── steps/           # Implementações de PipelineStep
+│   │   ├── experiment_pipeline.py
+│   │   └── experiment_state.py # Objeto central de dados e config
+│   └── main.py              # Script principal de execução
 ├── config.yaml               # Declaração de múltiplos experimentos
 ├── pyproject.toml            # Dependências geridas pelo Poetry
-└── main.py                   # Script principal de execução
+└── (outros ficheiros de sistema)
 ```
 ...
 ## 4. Componentes Principais
