@@ -10,34 +10,36 @@ Os dois principais algoritmos comparados são:
 O repositório foi construído utilizando práticas modernas de Engenharia de Software, especificamente focadas na desacoplação e flexibilidade experimental.
 
 ### 2.1 Padrão Chain of Responsibility (Data Pipeline)
-O fluxo de execução não é monolítico. É baseado numa pipeline de objetos do tipo `PipelineStep` que processam etapas específicas do fluxo. Cada passo recebe os dados do passo anterior e retorna os dados processados para o próximo: Grafo -> Grafo Ruidoso -> Comunidades (List[List[int]]) -> Métricas (List[float]).
+O fluxo de execução não é monolítico. É baseado numa pipeline de objetos do tipo `PipelineStep` que processam um objeto `ExperimentState`. Cada passo utiliza as configurações do estado e atualiza os seus dados de execução (grafo, comunidades, métricas).
 
-### 2.2 Padrão Builder
-A montagem dos Steps é feita através de um `ExperimentPipelineBuilder`. O orquestrador central (idealmente `main.py` ou scripts de execução) lê as intenções do ficheiro de configuração `config.yaml` e usa o Builder para encadear a ordem exata de execução: Geração -> Ruído -> Algoritmos -> Avaliação.
+### 2.2 Padrão Builder e Configuração
+A montagem dos experimentos é automatizada pela classe `ConfigurationReader`, que lê o `config.yaml`. Para cada entrada em `experiments`, o leitor:
+1. Cria um `ExperimentState` com os parâmetros específicos (seed, vértices, alpha, algoritmo, etc.).
+2. Constrói um `ExperimentPipeline` com a sequência padrão de steps.
+3. Retorna o par pronto para execução via `pipeline.run(state)`.
 
 ## 3. Estrutura de Diretórios
 ```text
 poc/
-├── data/
-│   ├── raw/                 # Grafos de Ground Truth (vazios por padrão no repo)
-│   └── processed/           # Grafos ruidosos (gerados em runtime)
-├── results/
-│   ├── communities/         # Saídas dos algoritmos
-│   └── metrics/             # Métricas (CSVs) e Gráficos por experimento
+├── data/                    # Dados temporários ou processados
+├── results/                 # Saídas dos experimentos
 ├── src/
+│   ├── experiment_configuration/
+│   │   └── configuration_reader.py # Orquestração via YAML
 │   └── experiment_pipeline/
-│       ├── steps/
-│       │   ├── data_generation/ # Geradores de grafos e injetores de ruído
-│       │   ├── evaluation/      # Cálculo de métricas (Jaccard, etc.)
-│       │   └── models/          # Wrappers para Louvain e nclusterbox
+│       ├── steps/           # Implementações de PipelineStep
 │       ├── experiment_pipeline.py
-│       └── experiment_pipeline_builder.py
-├── config.yaml               # Ficheiro central de hiperparâmetros (YAML)
-├── pyproject.toml            # Dependências geridas pelo Poetry (ou pip)
-└── README.md                 # Documentação básica de uso
+│       └── experiment_state.py # Objeto central de dados e config
+├── config.yaml               # Declaração de múltiplos experimentos
+├── pyproject.toml            # Dependências geridas pelo Poetry
+└── main.py                   # Script principal de execução
 ```
-
+...
 ## 4. Componentes Principais
+
+### 0. Estado do Experimento (`ExperimentState`)
+Objeto que centraliza todas as configurações (temas: `ground_truth_generation`, `noise_injection`, `community_detection`) e os resultados intermediários da execução.
+
 
 ### 4.1 Geração de Dados (`GraphGeneratorStep`)
 Gera grafos sintéticos onde as comunidades são cliques perfeitos. Permite configurar o número de nós, número de comunidades e semente aleatória.

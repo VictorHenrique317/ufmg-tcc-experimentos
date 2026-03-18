@@ -1,23 +1,23 @@
-from typing import List, Any
+from typing import List
 
 from src.experiment_pipeline.steps.pipeline_step import PipelineStep
+from src.experiment_pipeline.experiment_state import ExperimentState
 
 
 class ExperimentPipeline:
     """
-    O executor do Pipeline. Apenas itera sobre os passos, passando o resultado 
-    de um passo como entrada para o próximo.
+    O executor do Pipeline. Apenas itera sobre os passos,
+    passando e atualizando o objeto ExperimentState.
     """
-    def __init__(self, name: str, steps: List[PipelineStep]):
-        self.name = name
+    def __init__(self, steps: List[PipelineStep]):
         self.steps = steps
 
-    def run(self, initial_data: Any = None):
-        print(f"\n{'='*60}\nA iniciar Pipeline: {self.name}\n{'='*60}")
-        data = initial_data
+    def run(self, state: ExperimentState) -> ExperimentState:
+        print(f"\n{'='*60}\nA iniciar Pipeline: {state.name}\n{'='*60}")
         
         for step in self.steps:
-            data = step.run(data)
+            print(f"Executando Step: {step.name}")
+            state = step.run(state)
             
-        print(f"Pipeline '{self.name}' concluído com sucesso!")
-        return data
+        print(f"Pipeline '{state.name}' concluído com sucesso!")
+        return state
