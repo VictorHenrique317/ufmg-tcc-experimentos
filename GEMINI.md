@@ -10,7 +10,7 @@ Os dois principais algoritmos comparados são:
 O repositório foi construído utilizando práticas modernas de Engenharia de Software, especificamente focadas na desacoplação e flexibilidade experimental.
 
 ### 2.1 Padrão Chain of Responsibility (Data Pipeline)
-O fluxo de execução não é monolítico. É baseado numa pipeline de objetos do tipo `PipelineStep` que processam etapas específicas do fluxo. Cada passo recebe um contexto e retorna um contexto atualizado para o próximo passo.
+O fluxo de execução não é monolítico. É baseado numa pipeline de objetos do tipo `PipelineStep` que processam etapas específicas do fluxo. Cada passo recebe os dados do passo anterior e retorna os dados processados para o próximo: Grafo -> Grafo Ruidoso -> Comunidades (List[List[int]]) -> Métricas (List[float]).
 
 ### 2.2 Padrão Builder
 A montagem dos Steps é feita através de um `ExperimentPipelineBuilder`. O orquestrador central (idealmente `main.py` ou scripts de execução) lê as intenções do ficheiro de configuração `config.yaml` e usa o Builder para encadear a ordem exata de execução: Geração -> Ruído -> Algoritmos -> Avaliação.
@@ -50,7 +50,7 @@ Aplica ruído estocástico aos pesos das arestas usando a distribuição Beta vi
 * **NclusterboxDetector**: Interface com o binário `nclusterbox` (C++). Requer que o binário esteja no PATH ou que o caminho seja especificado.
 
 ### 4.4 Avaliação (`MetricsStep`)
-Calcula a similaridade entre as comunidades detetadas e a Ground Truth usando o Índice de Jaccard bidirecional, fornecendo métricas de pureza (precision) e cobertura (recall).
+Calcula o Índice de Jaccard para cada comunidade detetada em relação à melhor correspondência na Ground Truth. Retorna uma lista de scores (`List[float]`), preservando a ordem das comunidades detetadas.
 
 ## 5. Fluxo de Trabalho Recomendado
 1. **Configuração**: Definir os parâmetros do experimento no `config.yaml`.
