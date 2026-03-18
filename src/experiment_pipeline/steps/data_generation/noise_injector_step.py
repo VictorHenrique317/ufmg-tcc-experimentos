@@ -11,7 +11,7 @@ class NoiseInjectorStep(PipelineStep):
         self.random_state = random_state
 
 
-    def execute(self, graph: nx.Graph) -> nx.Graph:
+    def run(self, graph: nx.Graph) -> nx.Graph:
         """
         Aplica ruído estocástico aos pesos das arestas utilizando o método de 
         Amostragem por Transformada Inversa (ITS) com base na distribuição Beta.

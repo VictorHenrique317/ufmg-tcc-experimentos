@@ -1,7 +1,7 @@
 import networkx as nx
 import numpy as np
 import itertools
-from typing import Tuple, List, Set
+from typing import Tuple, List, Set, Any
 
 from src.experiment_pipeline.steps.pipeline_step import PipelineStep
 
@@ -17,22 +17,20 @@ class GraphGeneratorStep(PipelineStep):
         self.n_nodes = n_nodes
         self.n_communities = n_communities
         self.seed = seed
+        self.ground_truth = None
 
-    def execute(self) -> Tuple[nx.Graph, List[Set[int]]]:
+    def run(self, data: Any = None) -> nx.Graph:
         """
-        Gera o grafo sintético e retorna tanto o grafo quanto a Ground Truth das comunidades.
-        
-        Retorna:
-        --------
-        Tuple[nx.Graph, List[Set[int]]]
-            - G: Grafo NetworkX puro (sem pesos).
-            - ground_truth: Lista contendo conjuntos de nós, onde cada conjunto é uma comunidade.
+        Gera o grafo sintético e retorna apenas o grafo NetworkX.
+        A Ground Truth é armazenada no atributo `self.ground_truth`.
         """
-        return self.generate_synthetic_graph(
+        graph, gt = self.generate_synthetic_graph(
             n_nodes=self.n_nodes, 
             n_communities=self.n_communities, 
             seed=self.seed
         )
+        self.ground_truth = gt
+        return graph
 
     def generate_synthetic_graph(
         self,

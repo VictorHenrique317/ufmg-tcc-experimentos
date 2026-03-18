@@ -38,8 +38,9 @@ class BaseDetector(PipelineStep):
         """
         pass
 
-    def run(self, graph: nx.Graph, **kwargs) -> List[Set[int]]:
+    def run(self, graph: nx.Graph, **kwargs) -> List[List[int]]:
         """
-        Método de conveniência para executar o fit e obter as comunidades em um único passo.
+        Executa o algoritmo e retorna as comunidades como uma lista de listas de nós.
         """
-        return self.fit(graph, **kwargs).get_communities()
+        communities_sets = self.fit(graph, **kwargs).get_communities()
+        return [list(c) for c in communities_sets]

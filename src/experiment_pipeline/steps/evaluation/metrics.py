@@ -8,25 +8,24 @@ class MetricsStep(PipelineStep):
         super().__init__(name="Evaluation Metrics")
         self.ground_truth = ground_truth
 
-    def execute(self, detected_communities: List[Set[int]]) -> Dict[str, Any]:
+    def run(self, detected_communities: List[List[int]]) -> List[float]:
         """
-        Compara as comunidades inferidas com a Ground Truth através de um 
-        mapeamento de Jaccard bidirecional.
+        Calcula o índice de Jaccard para cada comunidade detectada em relação à 
+        melhor correspondência na Ground Truth.
         
-        Parâmetros:
-        -----------
-        detected_communities : List[Set[int]]
-            Comunidades encontradas pelo algoritmo (Louvain ou nclusterbox).
-            
         Retorna:
         --------
-        Dict[str, Any]
-            Dicionário contendo os scores médios e os mapeamentos detalhados.
+        List[float]
+            Uma lista de scores, preservando a ordem das comunidades detectadas.
         """
-        return self.evaluate_communities(
-            detected=detected_communities, 
-            ground_truth=self.ground_truth
-        )
+        scores = []
+        for det_comm in detected_communities:
+            det_set = set(det_comm)
+            # Para cada comunidade detectada, encontra o maior Jaccard na GT
+            best_score = max((self.jaccard_index(det_set, gt_comm) for gt_comm in self.ground_truth), default=0.0)
+            scores.append(float(best_score))
+            
+        return scores
 
     def jaccard_index(self, set_a: Set[int], set_b: Set[int]) -> float:
         """
