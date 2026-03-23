@@ -30,6 +30,11 @@ The project is structured to be executed as a Python module. To run the experime
 poetry run python -m src.main
 ```
 
+To run a subset of experiments, use the `-e` flag followed by the experiment names:
+```bash
+poetry run python -m src.main -e "Experiment Name 1" "Experiment Name 2"
+```
+
 ## ⚙️ Configuration
 
 Experiments are defined in the `config.yaml` file at the root of the project. You can declare multiple experiments with different parameters:

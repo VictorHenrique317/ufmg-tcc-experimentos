@@ -58,7 +58,15 @@ Calcula o Índice de Jaccard para cada comunidade detetada em relação à melho
 ## 5. Fluxo de Trabalho Recomendado
 1. **Configuração**: Definir os parâmetros do experimento no `config.yaml`.
 2. **Construção**: Usar o `ExperimentPipelineBuilder` para instanciar os steps necessários.
-3. **Execução**: Chamar o método `run()` do pipeline construído.
+3. **Execução**:
+   Para executar todos os experimentos definidos no `config.yaml`:
+   ```bash
+   poetry run python -m src.main
+   ```
+   Para executar um subconjunto de experimentos, use a flag `-e` seguida dos nomes dos experimentos:
+   ```bash
+   poetry run python -m src.main -e "Nome do Experimento 1" "Nome do Experimento 2"
+   ```
 4. **Análise**: Verificar os resultados na pasta `results/`.
 
 ## 6. Requisitos Técnicos
