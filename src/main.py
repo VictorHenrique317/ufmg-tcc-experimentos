@@ -12,11 +12,6 @@ def main():
     # 2. Executar cada pipeline
     results = []
     for pipeline, state in experiments:
-        # Apenas para este teste, vamos saltar o nclusterbox se o binário não existir
-        if state.community_detection_algorithm == "nclusterbox":
-            print(f"\nSaltando {state.name}: Binário nclusterbox necessário.")
-            continue
-            
         final_state = pipeline.run(state)
         results.append(final_state)
         
