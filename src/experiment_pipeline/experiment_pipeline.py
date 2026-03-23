@@ -27,36 +27,53 @@ class ExperimentPipeline:
         exp_name_fs = state.name.replace(' ', '_').replace('/', '_').replace(':', '')
         file_path = os.path.join(output_dir, f"{exp_name_fs}.json")
         
-        data = {}
+        config = {}
+        step_output = {}
         
         if step.name == "Graph Generation":
+            config = {
+                "random_seed": state.random_seed,
+                "number_of_vertices": state.number_of_vertices,
+                "number_of_ground_truth_communities": state.number_of_ground_truth_communities
+            }
             if state.graph:
-                data['graph'] = nx.node_link_data(state.graph)
+                step_output['graph'] = nx.node_link_data(state.graph)
             if state.ground_truth:
-                data['ground_truth'] = [list(c) for c in state.ground_truth]
+                step_output['ground_truth'] = [list(c) for c in state.ground_truth]
         
         elif step.name == "Noise Injector":
+            config = {
+                "number_of_correct_observations": state.number_of_correct_observations
+            }
             if state.graph:
-                data['weighted_graph'] = nx.node_link_data(state.graph)
+                step_output['weighted_graph'] = nx.node_link_data(state.graph)
 
         elif step.name == "Community Detector":
-            data['algorithm'] = state.community_detection_algorithm
+            config = {
+                "algorithm": state.community_detection_algorithm,
+                "timeout": state.timeout
+            }
             if state.detected_communities is not None:
-                data['detected_communities'] = state.detected_communities
+                step_output['detected_communities'] = state.detected_communities
             if state.detection_time is not None:
-                data['detection_time'] = state.detection_time
+                step_output['detection_time'] = state.detection_time
                 
         elif step.name == "Evaluation Metrics":
-            data = {
+            config = {
+                "number_of_ground_truth_communities": state.number_of_ground_truth_communities
+            }
+            step_output = {
                 "num_detected_communities": state.num_detected_communities,
                 "mean_jaccard": state.mean_jaccard,
                 "top_k_mean_jaccard": state.top_k_mean_jaccard,
                 "detection_time": state.detection_time,
             }
 
-        if data:
+        data_to_save = {"config": config, "step_output": step_output}
+
+        if data_to_save["config"] or data_to_save["step_output"]:
             with open(file_path, 'w') as f:
-                json.dump(data, f, indent=4)
+                json.dump(data_to_save, f, indent=4)
             print(f"  Resultados guardados em: {file_path}")
 
     def run(self, state: ExperimentState) -> ExperimentState:
