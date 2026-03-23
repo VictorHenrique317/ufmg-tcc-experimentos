@@ -59,9 +59,7 @@ class ExperimentPipeline:
                 step_output['detection_time'] = state.detection_time
                 
         elif step.name == "Evaluation Metrics":
-            config = {
-                "number_of_ground_truth_communities": state.number_of_ground_truth_communities
-            }
+            config = {}
             step_output = {
                 "num_detected_communities": state.num_detected_communities,
                 "mean_jaccard": state.mean_jaccard,
