@@ -214,3 +214,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Nclusterbox
+
+libs/nclusterbox/nclusterbox
+libs/nclusterbox/src/*/*.o
