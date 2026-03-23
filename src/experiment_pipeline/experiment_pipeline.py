@@ -22,11 +22,12 @@ class ExperimentPipeline:
         step_type = StepType.from_step_name(step.name)
         step_order_number = step_type.order_number
         step_name_fs = f"{step_order_number}_{step_type.step_name.replace(' ', '_').lower()}"
-        output_dir = os.path.join("results", step_name_fs)
+
+        exp_name_fs = state.name.replace(' ', '_').replace('/', '_').replace(':', '')
+        output_dir = os.path.join("results", exp_name_fs, step_name_fs)
         os.makedirs(output_dir, exist_ok=True)
         
-        exp_name_fs = state.name.replace(' ', '_').replace('/', '_').replace(':', '')
-        file_path = os.path.join(output_dir, f"{exp_name_fs}.json")
+        file_path = os.path.join(output_dir, f"iter_{state.current_iteration}.json")
         
         config = {}
         step_output = {}
@@ -63,6 +64,7 @@ class ExperimentPipeline:
                 "mean_jaccard": state.mean_jaccard,
                 "top_k_mean_jaccard": state.top_k_mean_jaccard,
                 "detection_time": state.detection_time,
+                "raw_jaccard_scores": state.raw_jaccard_scores
             }
 
         data_to_save = {"config": config, "step_output": step_output}

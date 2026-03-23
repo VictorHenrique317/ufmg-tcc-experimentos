@@ -1,4 +1,6 @@
 import argparse
+import copy
+import numpy as np
 from src.experiment_configuration.configuration_reader import ConfigurationReader
 
 def main():
@@ -29,26 +31,63 @@ def main():
             return
 
     # 2. Executar cada pipeline
-    results = []
-    for pipeline, state in experiments_to_run:
-        print(f"Running experiment: {state.name}")
-        final_state = pipeline.run(state)
-        results.append(final_state)
+    experiment_summaries = []
+    for pipeline, base_state in experiments_to_run:
+        print(f"Running experiment: {base_state.name} for {base_state.iterations} iterations")
+        iteration_results = []
+        base_seed = base_state.random_seed
         
-    # 3. Mostrar sumário simples
+        for i in range(base_state.iterations):
+            iter_state = copy.deepcopy(base_state)
+            iter_state.current_iteration = i + 1
+            iter_state.random_seed = base_seed + i # Vary seed per iteration
+            
+            print(f"\n--- Iteration {iter_state.current_iteration}/{base_state.iterations} (seed: {iter_state.random_seed}) ---")
+            
+            final_state = pipeline.run(iter_state)
+            iteration_results.append(final_state)
+            
+        # 3. Gerar sumário agregado para o experimento
+        summary = {
+            "name": base_state.name,
+            "iterations": base_state.iterations,
+            "number_of_ground_truth_communities": base_state.number_of_ground_truth_communities,
+            "aggregated_metrics": {}
+        }
+        
+        # Collect metrics from all iterations
+        all_mean_jaccards = [res.mean_jaccard for res in iteration_results if res.mean_jaccard is not None]
+        all_top_k_jaccards = [res.top_k_mean_jaccard for res in iteration_results if res.top_k_mean_jaccard is not None]
+        all_detection_times = [res.detection_time for res in iteration_results if res.detection_time is not None]
+        
+        if all_mean_jaccards:
+            summary["aggregated_metrics"]["avg_mean_jaccard"] = np.mean(all_mean_jaccards)
+            summary["aggregated_metrics"]["std_mean_jaccard"] = np.std(all_mean_jaccards)
+            
+        if all_top_k_jaccards:
+            summary["aggregated_metrics"]["avg_top_k_mean_jaccard"] = np.mean(all_top_k_jaccards)
+            summary["aggregated_metrics"]["std_top_k_mean_jaccard"] = np.std(all_top_k_jaccards)
+            
+        if all_detection_times:
+            summary["aggregated_metrics"]["avg_detection_time"] = np.mean(all_detection_times)
+
+        experiment_summaries.append(summary)
+        
+    # 4. Mostrar sumário final
     print("\n" + "="*60)
-    print("SUMÁRIO DOS RESULTADOS")
+    print("SUMMARY OF AGGREGATED RESULTS")
     print("="*60)
-    for res in results:
-        print(f"Experimento: {res.name}")
-        if res.num_detected_communities is not None:
-            print(f"  Comunidades Detectadas: {res.num_detected_communities}")
-            print(f"  Média Jaccard: {res.mean_jaccard:.4f}")
-            print(f"  Média Top-{res.number_of_ground_truth_communities} Jaccard: {res.top_k_mean_jaccard:.4f}")
-            if res.detection_time is not None:
-                print(f"  Tempo de Detecção: {res.detection_time:.4f} segundos")
+    for summary in experiment_summaries:
+        print(f"Experiment: {summary['name']} ({summary['iterations']} iterations)")
+        metrics = summary.get("aggregated_metrics", {})
+        if metrics:
+            k = summary['number_of_ground_truth_communities']
+            print(f"  Avg. Mean Jaccard: {metrics.get('avg_mean_jaccard', 0.0):.4f} (std: {metrics.get('std_mean_jaccard', 0.0):.4f})")
+            print(f"  Avg. Top-{k} Jaccard: {metrics.get('avg_top_k_mean_jaccard', 0.0):.4f} (std: {metrics.get('std_top_k_mean_jaccard', 0.0):.4f})")
+            if 'avg_detection_time' in metrics:
+                print(f"  Avg. Detection Time: {metrics.get('avg_detection_time', 0.0):.4f} seconds")
         else:
-            print("  Nenhuma métrica calculada (nenhuma comunidade detectada).")
+            print("  No metrics were calculated for this experiment.")
         print("-" * 30)
 
 if __name__ == "__main__":

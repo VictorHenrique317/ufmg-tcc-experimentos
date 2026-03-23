@@ -23,6 +23,10 @@ class ExperimentState:
     # Configurações de Detecção
     community_detection_algorithm: str # 'louvain' ou 'nclusterbox'
     timeout: Optional[int] = None
+
+    # Configuração do Experimento
+    iterations: int = 1
+    current_iteration: int = 0
     
     # Dados de Execução (Runtime)
     original_graph: Optional[nx.Graph] = field(default=None, repr=False)
@@ -35,11 +39,13 @@ class ExperimentState:
     mean_jaccard: Optional[float] = field(default=None)
     top_k_mean_jaccard: Optional[float] = field(default=None)
     detection_time: Optional[float] = field(default=None)
+    raw_jaccard_scores: Optional[List[float]] = field(default=None, repr=False)
 
     def to_dict(self) -> Dict[str, Any]:
         """Retorna um sumário do estado (sem o grafo completo)."""
-        return {
+        summary = {
             "name": self.name,
+            "iteration": self.current_iteration,
             "config": {
                 "seed": self.random_seed,
                 "n_vertices": self.number_of_vertices,
@@ -52,6 +58,9 @@ class ExperimentState:
                 "num_detected_communities": self.num_detected_communities,
                 "mean_jaccard": self.mean_jaccard,
                 "top_k_mean_jaccard": self.top_k_mean_jaccard,
-                "detection_time": self.detection_time
+                "detection_time": self.detection_time,
             }
         }
+        if self.raw_jaccard_scores is not None:
+            summary['metrics']['raw_jaccard_scores'] = self.raw_jaccard_scores
+        return summary

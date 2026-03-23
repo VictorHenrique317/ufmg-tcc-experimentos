@@ -32,6 +32,7 @@ class ConfigurationReader:
             # Criação do Estado
             state = ExperimentState(
                 name=exp_config.get('name', 'Unnamed Experiment'),
+                iterations=exp_config.get('iterations', 1),
                 random_seed=gt_gen.get('random_seed', 42),
                 number_of_vertices=gt_gen.get('number_of_vertices', 500),
                 number_of_ground_truth_communities=gt_gen.get('number_of_ground_truth_communities', 5),

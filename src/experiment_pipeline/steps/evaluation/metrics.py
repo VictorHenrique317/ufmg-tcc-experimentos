@@ -23,7 +23,11 @@ class MetricsStep(PipelineStep):
             scores.append(float(best_score))
         
         if not scores:
+            state.raw_jaccard_scores = []
             return state
+
+        # Store raw scores
+        state.raw_jaccard_scores = scores
 
         # Calcular métricas agregadas
         state.num_detected_communities = len(scores)
