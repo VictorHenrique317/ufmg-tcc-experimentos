@@ -1,109 +1,109 @@
 experiments:
-  - name: "louvain_V200_C20_N16"
+  - name: "louvain_V500_C100_N16"
     iterations: 30
     ground_truth_generation:
       random_seed: 42
-      number_of_vertices: 200
-      number_of_ground_truth_communities: 20
+      number_of_vertices: 500
+      number_of_ground_truth_communities: 100
     noise_injection:
       number_of_correct_observations: 16.0
     community_detection:
       algorithm: "louvain"
 
-  - name: "nclusterbox_V200_C20_N16"
+  - name: "nclusterbox_V500_C100_N16"
     iterations: 30
     ground_truth_generation:
       random_seed: 42
-      number_of_vertices: 200
-      number_of_ground_truth_communities: 20
+      number_of_vertices: 500
+      number_of_ground_truth_communities: 100
     noise_injection:
       number_of_correct_observations: 16.0
     community_detection:
       algorithm: "nclusterbox"
 
-  - name: "louvain_V200_C20_N8"
+  - name: "louvain_V500_C100_N8"
     iterations: 30
     ground_truth_generation:
       random_seed: 42
-      number_of_vertices: 200
-      number_of_ground_truth_communities: 20
+      number_of_vertices: 500
+      number_of_ground_truth_communities: 100
     noise_injection:
       number_of_correct_observations: 8.0
     community_detection:
       algorithm: "louvain"
 
-  - name: "nclusterbox_V200_C20_N8"
+  - name: "nclusterbox_V500_C100_N8"
     iterations: 30
     ground_truth_generation:
       random_seed: 42
-      number_of_vertices: 200
-      number_of_ground_truth_communities: 20
+      number_of_vertices: 500
+      number_of_ground_truth_communities: 100
     noise_injection:
       number_of_correct_observations: 8.0
     community_detection:
       algorithm: "nclusterbox"
 
-  - name: "louvain_V200_C20_N4"
+  - name: "louvain_V500_C100_N4"
     iterations: 30
     ground_truth_generation:
       random_seed: 42
-      number_of_vertices: 200
-      number_of_ground_truth_communities: 20
+      number_of_vertices: 500
+      number_of_ground_truth_communities: 100
     noise_injection:
       number_of_correct_observations: 4.0
     community_detection:
       algorithm: "louvain"
 
-  - name: "nclusterbox_V200_C20_N4"
+  - name: "nclusterbox_V500_C100_N4"
     iterations: 30
     ground_truth_generation:
       random_seed: 42
-      number_of_vertices: 200
-      number_of_ground_truth_communities: 20
+      number_of_vertices: 500
+      number_of_ground_truth_communities: 100
     noise_injection:
       number_of_correct_observations: 4.0
     community_detection:
       algorithm: "nclusterbox"
 
-  - name: "louvain_V200_C20_N2"
+  - name: "louvain_V500_C100_N2"
     iterations: 30
     ground_truth_generation:
       random_seed: 42
-      number_of_vertices: 200
-      number_of_ground_truth_communities: 20
+      number_of_vertices: 500
+      number_of_ground_truth_communities: 100
     noise_injection:
       number_of_correct_observations: 2.0
     community_detection:
       algorithm: "louvain"
 
-  - name: "nclusterbox_V200_C20_N2"
+  - name: "nclusterbox_V500_C100_N2"
     iterations: 30
     ground_truth_generation:
       random_seed: 42
-      number_of_vertices: 200
-      number_of_ground_truth_communities: 20
+      number_of_vertices: 500
+      number_of_ground_truth_communities: 100
     noise_injection:
       number_of_correct_observations: 2.0
     community_detection:
       algorithm: "nclusterbox"
 
-  - name: "louvain_V200_C20_N1"
+  - name: "louvain_V500_C100_N1"
     iterations: 30
     ground_truth_generation:
       random_seed: 42
-      number_of_vertices: 200
-      number_of_ground_truth_communities: 20
+      number_of_vertices: 500
+      number_of_ground_truth_communities: 100
     noise_injection:
       number_of_correct_observations: 1.0
     community_detection:
       algorithm: "louvain"
 
-  - name: "nclusterbox_V200_C20_N1"
+  - name: "nclusterbox_V500_C100_N1"
     iterations: 30
     ground_truth_generation:
       random_seed: 42
-      number_of_vertices: 200
-      number_of_ground_truth_communities: 20
+      number_of_vertices: 500
+      number_of_ground_truth_communities: 100
     noise_injection:
       number_of_correct_observations: 1.0
     community_detection:
