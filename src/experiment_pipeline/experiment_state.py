@@ -25,7 +25,8 @@ class ExperimentState:
     timeout: Optional[int] = None
     
     # Dados de Execução (Runtime)
-    graph: Optional[nx.Graph] = field(default=None, repr=False)
+    original_graph: Optional[nx.Graph] = field(default=None, repr=False)
+    noisy_graph: Optional[nx.Graph] = field(default=None, repr=False)
     ground_truth: Optional[List[Set[int]]] = field(default=None, repr=False)
     detected_communities: Optional[List[List[int]]] = field(default=None, repr=False)
     

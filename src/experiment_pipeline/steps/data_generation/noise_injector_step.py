@@ -14,11 +14,11 @@ class NoiseInjectorStep(PipelineStep):
         Aplica ruído estocástico aos pesos das arestas utilizando o método de 
         Amostragem por Transformada Inversa (ITS) com base na distribuição Beta.
         """
-        if state.graph is None:
-            raise ValueError("O grafo no ExperimentState está vazio.")
+        if state.original_graph is None:
+            raise ValueError("O grafo original no ExperimentState está vazio.")
             
-        state.graph = self.apply_beta_its_noise(
-            graph=state.graph, 
+        state.noisy_graph = self.apply_beta_its_noise(
+            graph=state.original_graph, 
             alpha=state.number_of_correct_observations, 
             beta_param=self.beta_param, 
             random_state=state.random_seed

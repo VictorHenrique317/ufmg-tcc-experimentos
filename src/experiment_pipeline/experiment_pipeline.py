@@ -37,16 +37,16 @@ class ExperimentPipeline:
                 "number_of_vertices": state.number_of_vertices,
                 "number_of_ground_truth_communities": state.number_of_ground_truth_communities
             }
-        
-            step_output['graph'] = nx.node_link_data(state.graph)
+
+            step_output['graph'] = nx.node_link_data(state.original_graph)
             step_output['ground_truth'] = [list(c) for c in state.ground_truth] if state.ground_truth else None
-        
+
         elif step.name == StepType.NOISE_INJECTION.step_name:
             config = {
                 "number_of_correct_observations": state.number_of_correct_observations
             }
-            
-            step_output['weighted_graph'] = nx.node_link_data(state.graph)
+
+            step_output['weighted_graph'] = nx.node_link_data(state.noisy_graph)
 
         elif step.name == StepType.COMMUNITY_DETECTOR.step_name:
             config = {
@@ -55,7 +55,7 @@ class ExperimentPipeline:
             }
             step_output['detected_communities'] = state.detected_communities
             step_output['detection_time'] = state.detection_time
-                
+
         elif step.name == StepType.EVALUATION_METRICS.step_name:
             config = {}
             step_output = {

@@ -29,12 +29,12 @@ class BaseDetector(PipelineStep):
         """
         Executa o algoritmo sobre o grafo do estado e armazena os resultados.
         """
-        if state.graph is None:
-            raise ValueError("Grafo não encontrado no estado.")
+        if state.noisy_graph is None:
+            raise ValueError("Grafo ruidoso não encontrado no estado.")
             
         start_time = time.time()
         # Pass seed and timeout directly to fit, allowing specific detectors to use them
-        self.fit(state.graph, seed=state.random_seed, timeout=state.timeout)
+        self.fit(state.noisy_graph, seed=state.random_seed, timeout=state.timeout)
         state.detected_communities = [list(c) for c in self.get_communities()]
         end_time = time.time()
         state.detection_time = end_time - start_time

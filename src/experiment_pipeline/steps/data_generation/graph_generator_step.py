@@ -23,7 +23,7 @@ class GraphGeneratorStep(PipelineStep):
             n_communities=state.number_of_ground_truth_communities, 
             seed=state.random_seed
         )
-        state.graph = graph
+        state.original_graph = graph
         state.ground_truth = gt
         return state
 
