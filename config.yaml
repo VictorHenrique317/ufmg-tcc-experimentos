@@ -18,3 +18,23 @@ experiments:
       number_of_correct_observations: 0.01
     community_detection:
       algorithm: "louvain"
+
+  - name: "Nclusterbox Low Noise"
+    ground_truth_generation:
+      random_seed: 42
+      number_of_vertices: 200
+      number_of_ground_truth_communities: 4
+    noise_injection:
+      number_of_correct_observations: 16.0
+    community_detection:
+      algorithm: "nclusterbox"
+
+  - name: "Nclusterbox High Noise"
+    ground_truth_generation:
+      random_seed: 42
+      number_of_vertices: 200
+      number_of_ground_truth_communities: 4
+    noise_injection:
+      number_of_correct_observations: 0.01
+    community_detection:
+      algorithm: "nclusterbox"

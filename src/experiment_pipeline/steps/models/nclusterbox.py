@@ -12,7 +12,7 @@ class NclusterboxDetector(BaseDetector):
     Wrapper para o algoritmo nclusterbox.
     """
     
-    def __init__(self, executable_path: str = "nclusterbox", max_patterns: int = None, jobs: int = None):
+    def __init__(self, executable_path: str = "libs/nclusterbox/nclusterbox", max_patterns: int = None, jobs: int = None):
         super().__init__(name="Nclusterbox Detector")
         self.executable_path = executable_path
         self.max_patterns = max_patterns
