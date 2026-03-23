@@ -11,6 +11,12 @@ class BaseDetector(PipelineStep):
     Interface base genérica para todos os algoritmos de detecção de comunidades.
     """
     
+    @property
+    @abstractmethod
+    def algorithm_type(self) -> str:
+        """Returns the string identifier for the specific detection algorithm (e.g., 'louvain', 'nclusterbox')."""
+        pass
+
     @abstractmethod
     def fit(self, graph: nx.Graph, **kwargs) -> 'BaseDetector':
         pass

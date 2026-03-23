@@ -9,9 +9,13 @@ class LouvainDetector(BaseDetector):
     """
     
     def __init__(self, resolution: float = 1.0):
-        super().__init__(name="Louvain Detector")
+        super().__init__(name="Community Detector")
         self.resolution = resolution
         self.communities_ = []
+
+    @property
+    def algorithm_type(self) -> str:
+        return "louvain"
 
     def fit(self, graph: nx.Graph, **kwargs) -> 'BaseDetector':
         # Nota: Usamos a semente que vier no kwargs ou deixamos None

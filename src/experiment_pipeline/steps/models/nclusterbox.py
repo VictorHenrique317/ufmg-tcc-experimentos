@@ -13,11 +13,15 @@ class NclusterboxDetector(BaseDetector):
     """
     
     def __init__(self, executable_path: str = "libs/nclusterbox/nclusterbox", max_patterns: int = None, jobs: int = None):
-        super().__init__(name="Nclusterbox Detector")
+        super().__init__(name="Community Detector")
         self.executable_path = executable_path
         self.max_patterns = max_patterns
         self.jobs = jobs
         self.communities_ = []
+
+    @property
+    def algorithm_type(self) -> str:
+        return "nclusterbox"
 
     def fit(self, graph: nx.Graph, **kwargs) -> 'BaseDetector':
         self.communities_ = []
