@@ -1,44 +1,110 @@
 experiments:
-  - name: "Louvain Low Noise"
-    iterations: 10
+  - name: "louvain_V200_C20_N16"
+    iterations: 30
     ground_truth_generation:
       random_seed: 42
       number_of_vertices: 200
-      number_of_ground_truth_communities: 4
+      number_of_ground_truth_communities: 20
     noise_injection:
       number_of_correct_observations: 16.0
     community_detection:
       algorithm: "louvain"
 
-  - name: "Louvain High Noise"
-    iterations: 10
+  - name: "nclusterbox_V200_C20_N16"
+    iterations: 30
     ground_truth_generation:
       random_seed: 42
       number_of_vertices: 200
-      number_of_ground_truth_communities: 4
-    noise_injection:
-      number_of_correct_observations: 0.01
-    community_detection:
-      algorithm: "louvain"
-
-  - name: "Nclusterbox Low Noise"
-    iterations: 10
-    ground_truth_generation:
-      random_seed: 42
-      number_of_vertices: 200
-      number_of_ground_truth_communities: 4
+      number_of_ground_truth_communities: 20
     noise_injection:
       number_of_correct_observations: 16.0
     community_detection:
       algorithm: "nclusterbox"
 
-  - name: "Nclusterbox High Noise"
-    iterations: 10
+  - name: "louvain_V200_C20_N8"
+    iterations: 30
     ground_truth_generation:
       random_seed: 42
       number_of_vertices: 200
-      number_of_ground_truth_communities: 4
+      number_of_ground_truth_communities: 20
     noise_injection:
-      number_of_correct_observations: 0.01
+      number_of_correct_observations: 8.0
+    community_detection:
+      algorithm: "louvain"
+
+  - name: "nclusterbox_V200_C20_N8"
+    iterations: 30
+    ground_truth_generation:
+      random_seed: 42
+      number_of_vertices: 200
+      number_of_ground_truth_communities: 20
+    noise_injection:
+      number_of_correct_observations: 8.0
+    community_detection:
+      algorithm: "nclusterbox"
+
+  - name: "louvain_V200_C20_N4"
+    iterations: 30
+    ground_truth_generation:
+      random_seed: 42
+      number_of_vertices: 200
+      number_of_ground_truth_communities: 20
+    noise_injection:
+      number_of_correct_observations: 4.0
+    community_detection:
+      algorithm: "louvain"
+
+  - name: "nclusterbox_V200_C20_N4"
+    iterations: 30
+    ground_truth_generation:
+      random_seed: 42
+      number_of_vertices: 200
+      number_of_ground_truth_communities: 20
+    noise_injection:
+      number_of_correct_observations: 4.0
+    community_detection:
+      algorithm: "nclusterbox"
+
+  - name: "louvain_V200_C20_N2"
+    iterations: 30
+    ground_truth_generation:
+      random_seed: 42
+      number_of_vertices: 200
+      number_of_ground_truth_communities: 20
+    noise_injection:
+      number_of_correct_observations: 2.0
+    community_detection:
+      algorithm: "louvain"
+
+  - name: "nclusterbox_V200_C20_N2"
+    iterations: 30
+    ground_truth_generation:
+      random_seed: 42
+      number_of_vertices: 200
+      number_of_ground_truth_communities: 20
+    noise_injection:
+      number_of_correct_observations: 2.0
+    community_detection:
+      algorithm: "nclusterbox"
+
+  - name: "louvain_V200_C20_N1"
+    iterations: 30
+    ground_truth_generation:
+      random_seed: 42
+      number_of_vertices: 200
+      number_of_ground_truth_communities: 20
+    noise_injection:
+      number_of_correct_observations: 1.0
+    community_detection:
+      algorithm: "louvain"
+
+  - name: "nclusterbox_V200_C20_N1"
+    iterations: 30
+    ground_truth_generation:
+      random_seed: 42
+      number_of_vertices: 200
+      number_of_ground_truth_communities: 20
+    noise_injection:
+      number_of_correct_observations: 1.0
     community_detection:
       algorithm: "nclusterbox"
