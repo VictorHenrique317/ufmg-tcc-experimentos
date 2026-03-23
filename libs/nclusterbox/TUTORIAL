@@ -1,0 +1,452 @@
+*** PROLOG ***
+
+This tutorial aims to discover nclusterbox in an easier way than going
+through the README file, which is more of a specification.  This
+tutorial assumes nclusterbox is installed and that you opened a
+terminal in the directory with the file primaryschool-every-2-hours.
+It does not assume familiarity with the terminal.  Along the way, you
+may discover other useful commands that are on your system.
+
+
+*** DATA ***
+
+On Thursday, 1 October 2009, and Friday, 2 October 2009, Stehlé et
+al. collected in a French primary school timestamped face-to-face
+contacts between 242 individuals, 232 children and 10 teachers:
+
+J. Stehlé, N. Voirin, A. Barrat, C. Cattuto, L. Isella, J.-F. Pinton,
+M. Quaggiotto, W. V. den Broeck, C. Régis, B. Lina, and P. Vanhems,
+"High-resolution measurements of face-to-face contact patterns in a
+primary school," PLOS ONE, vol. 6, no. 8, 2011.
+
+Every line of primaryschool-every-2-hours corresponds to at least one
+face-to-face contact between two individuals during a two-hour
+interval.  For the curious reader (you need not type that), here is
+the command line that downloaded the raw data and aggregated them:
+
+$ wget -qO - https://www.sociopatterns.org/wp-content/uploads/2015/09/primaryschool.csv.gz | zcat | awk '{ print int($1 / 7200) * 2, $2 ":" $4, $3 ":" $5 }' | sort -uo primaryschool-every-2-hours
+
+Let us look at the first line of primaryschool-every-2-hours:
+
+$ head -1 primaryschool-every-2-hours
+10 1426:5B 1427:5B
+
+It stands for two children (numbered 1426 and 1427) of the 5B class
+who had some face-to-face contact(s) on Thursday between 10am and
+midday.  Indeed, any line is composed of three space-separated fields:
+
+- the starting hour of a two-hour interval on Thursday or, if it
+exceeds 24, 24 must be subtracted to get the starting hour on Friday;
+- an individual identified by an integer followed by ":" and its class
+(1A, 1B, 2A, 2B, 3A, 3B, 4A, 4B, 5A, or 5B) or "Teacher";
+- another individual, identified in the same way.
+
+The space is nclusterbox's default dimension separator.  The elements
+of a dimension are arbitrary strings.  nclusterbox has no idea the
+classes are written.  It can be given other separating characters and
+the input format is flexible.  For example, it would be here possible
+to have every line listing *several* two-hour intervals during which
+two individuals were facing each other.  However, this tutorial does
+not aim to detail all nclusterbox's features.  The README file does.
+
+
+*** LET US BE UNCONSCIOUS ***
+
+There are only 20,804 triples.  The wc command can tell us that:
+
+$ wc -l primaryschool-every-2-hours
+20804 primaryschool-every-2-hours
+
+Let us be unconscious, assume no computational limitations, simply run
+nclusterbox with no option... and get an error message:
+
+$ nclusterbox primaryschool-every-2-hours
+primaryschool-every-2-hours:1: the membership, 1427:5B, should be a double in [0, 1]!
+
+nclusterbox returned an error code too:
+
+$ echo $?
+65
+
+65 means "an input data line is not properly formatted".  As the
+message explains, "a double in [0, 1]" was expected instead of
+1427:5B, in the first input line, the one we looked at.  Indeed,
+nclusterbox can summarize *fuzzy* tensors.  It expects every input
+n-tuple (triple here) to be associated with a membership degree
+between 0 and 1.  Missing n-tuples are associated with 0.
+
+The rough data could be pre-processed in a different way, to quantify
+to what extent two individuals were in contact.  We will here stick to
+primaryschool-every-2-hours.  It defines a Boolean tensor.  To make
+nclusterbox understand it, a fourth field always containing "1" can be
+added.  For instance, sed can append " 1" to every line and, giving no
+file to nclusterbox, the one sed edited is read through | (a pipe):
+
+$ sed 's/$/ 1/' primaryschool-every-2-hours | nclusterbox
+(...)
+
+However, it is simpler to use the --boolean (-b) option:
+
+$ nclusterbox -b primaryschool-every-2-hours
+(...)
+
+In both cases, tens of patterns are listed on the terminal.  We may
+want to take a look at them with less and its search features:
+
+$ nclusterbox -b primaryschool-every-2-hours | less
+
+After quitting (with q), the patterns are lost.  No big deal here:
+they are fast to recompute.  It may be different with a larger tensor
+though.  To save the patterns, we can redirect the standard output or
+use the --out (-o) option followed by the path to the file where to
+save the patterns (here "summary", in the working directory):
+
+$ nclusterbox -bo summary primaryschool-every-2-hours
+
+Writing "-bo summary" instead of "-b -o summary" saves a couple of
+keystrokes.  Indeed, nclusterbox's single letter options can be
+grouped (and only the last one can have an argument).
+
+
+*** A QUICK LOOK AT THE PATTERNS ***
+
+nclusterbox's output is sorted in descending order of contribution to
+the summary.  Let us truncate it after two patterns:
+
+$ head -2 summary
+8,32,40,38,14,34,10 1687:1B,1682:1B,1681:1B,1680:1B,1670:1B,1688:1B,1695:1B,1674:1B,1684:1B,1661:1B,1656:1B,1697:1B,1663:1B,1664:1B,1675:1B,1673:1B,1665:1B,1666:1B 1682:1B,1681:1B,1680:1B,1674:1B,1687:1B,1675:1B,1779:1B,1696:1B,1684:1B,1688:1B,1695:1B,1698:1B,1697:1B,1745:Teachers,1920:1B,1908:1B,1765:1B,1912:1B 0.576718
+32,40,16,38,14,34,10 1800:3A,1801:3A,1782:3A,1795:3A,1738:3A,1763:3A,1741:3A,1746:Teachers,1737:3A,1723:3A,1748:3A,1780:3A,1720:3A,1722:3A,1714:3A,1719:3A,1579:3B,1551:3B 1800:3A,1746:Teachers,1748:3A,1782:3A,1820:3A,1763:3A,1809:3A,1801:3A,1795:3A,1843:3A,1780:3A,1838:3A,1859:3A,1909:3A,1833:3A,1822:3A 0.544145
+
+At first sight, those two patterns look sensible.  The number ending a
+line is a density: for each pattern, of all the covered triples, more
+than half correspond to contacts.  Each of the two patterns involves
+only class hours (not 12 and 36, the two-hour lunch breaks) and a
+single class (1B for the first pattern; 3A for the second) with one
+teacher.  How many individuals exactly?  Instead of counting by hand,
+let us rerun nclusterbox with the --ps option, which counts for us:
+
+$ nclusterbox -bo summary --ps primaryschool-every-2-hours
+
+The summary file is overwritten.  Its first two lines have become:
+
+$ head -2 summary
+8,32,40,38,14,34,10 1687:1B,1682:1B,1681:1B,1680:1B,1670:1B,1688:1B,1695:1B,1674:1B,1684:1B,1661:1B,1656:1B,1697:1B,1663:1B,1664:1B,1675:1B,1673:1B,1665:1B,1666:1B 1682:1B,1681:1B,1680:1B,1674:1B,1687:1B,1675:1B,1779:1B,1696:1B,1684:1B,1688:1B,1695:1B,1698:1B,1697:1B,1745:Teachers,1920:1B,1908:1B,1765:1B,1912:1B 0.576718 : 7 18 18
+32,40,16,38,14,34,10 1800:3A,1801:3A,1782:3A,1795:3A,1738:3A,1763:3A,1741:3A,1746:Teachers,1737:3A,1723:3A,1748:3A,1780:3A,1720:3A,1722:3A,1714:3A,1719:3A,1579:3B,1551:3B 1800:3A,1746:Teachers,1748:3A,1782:3A,1820:3A,1763:3A,1809:3A,1801:3A,1795:3A,1843:3A,1780:3A,1838:3A,1859:3A,1909:3A,1833:3A,1822:3A 0.544145 : 7 18 16
+
+The space-separated numbers after " : " are how many elements in each
+dimension.  For example, there are 18 individuals in the second
+dimension of the second pattern and 16 in its third dimension.
+Looking more closely, they have only 8 individuals in common.
+
+
+*** PLOT TWIST ***
+
+Having patterns dimensions with different elements is usual.  The
+tensor itself could have semantically distinct dimensions.  For
+instance, another 3-way tensor could indicate the academic disciplines
+(mathematics, history, etc.: the first field in an input line) a child
+(second field) studied every day (third field).  Here however, seeing
+the individuals as vertices, primaryschool-every-2-hours defines one
+graph per two-hour interval.  It is expected to be undirected, each
+edge corresponding to a contact.  And if both directions for the edges
+were always input, nclusterbox would often discover "communities":
+patterns with twice the same set of vertices.  Are both directions
+always input though?  Let us search the first contact reversed:
+
+$ grep -x '10 1427:5B 1426:5B' primaryschool-every-2-hours
+
+No output: the triple is absent.  In fact, the rough data always
+specify one single direction.  The self loops (specifying that an
+individual is always in contact with herself) are absent too.  Until
+now, we have been unconscious not only by assuming that nclusterbox
+would run fast (it was true, but would not be with large tensors) but
+also by not exploring the rough data!
+
+Even if primaryschool-every-2-hours was specifying undirected graphs,
+nclusterbox would not necessarily find communities.  To add the
+reverse edges and the self-loops and, most importantly, to
+specifically search for communities, the --communities (-c) option
+must be used, followed by the numbers (starting at 1) of the two
+fields with vertices or just the first number if they follow each
+other (the case here, the individuals being in the last two fields):
+
+$ nclusterbox -bo summary --ps -c 2 primaryschool-every-2-hours
+
+
+*** HELP! ***
+
+The execution is approximately 40% faster.  You may have not noticed
+it, if your processor has many cores.  Let us search for 1 pattern at
+a time with --jobs (-j) option and clock.  On my laptop, that gives:
+
+$ /usr/bin/time nclusterbox -bo summary --ps -j 1 primaryschool-every-2-hours
+5.03user 0.00system 0:05.03elapsed 100%CPU (0avgtext+0avgdata 13084maxresident)k
+0inputs+24outputs (0major+2560minor)pagefaults 0swaps
+
+$ /usr/bin/time nclusterbox -bo summary --ps -c 2 -j 1 primaryschool-every-2-hours
+3.13user 0.00system 0:03.13elapsed 100%CPU (0avgtext+0avgdata 11484maxresident)k
+0inputs+16outputs (0major+1899minor)pagefaults 0swaps
+
+The default number of simultaneous searches depends on your processor.
+To know the number for yours, you can use the --help (-h) option:
+
+$ nclusterbox -h
+
+The command sums up nclusterbox's main options.  It shows between
+parentheses the default argument for an option.  In this way, the line
+below indicates 8 simultaneous searches of patterns by default:
+
+  -j [ --jobs ] arg (=8)   set nb of simultaneous searches of patterns
+
+The options altering the Input/Output formats, such as --ps, have not
+been listed.  For those, --hio must replace -h:
+
+$ nclusterbox --hio
+
+Among the output, the two lines below explain that --sp and --ss can
+change the way --ps formats the sizes of the pattern dimensions:
+
+  --sp arg (= : )       set string prefixing sizes in output
+  --ss arg (= )         set string separating sizes in output
+
+So, no, we need not learn every option name by heart.  Just --help.
+
+
+*** ANALYZING A FEW COMMUNITIES ***
+
+With the --communities (-c) option, every pattern is a community, with
+twice the same set of individuals.  Keeping, with the cut command,
+only one such set, let us look at the first two communities:
+
+$ head -2 summary | cut -d ' ' -f 1,3-7
+8,32,40,38,14,34,10 1682:1B,1687:1B,1681:1B,1779:1B,1661:1B,1670:1B,1680:1B,1663:1B,1920:1B,1656:1B,1908:1B,1696:1B,1674:1B,1745:Teachers,1664:1B,1688:1B,1698:1B,1912:1B,1684:1B,1695:1B,1765:1B,1665:1B,1666:1B,1675:1B,1673:1B,1697:1B 0.694505 : 7 26
+32,40,16,38,14,34,10 1800:3A,1738:3A,1820:3A,1737:3A,1723:3A,1741:3A,1809:3A,1746:Teachers,1782:3A,1801:3A,1714:3A,1748:3A,1720:3A,1763:3A,1859:3A,1843:3A,1722:3A,1909:3A,1838:3A,1719:3A,1795:3A,1833:3A,1780:3A,1822:3A 0.664077 : 7 24
+
+Both communities are dense.  69% of the 7 x 26 x (26 - 1) / 2 = 2275
+triples the first pattern covers are undirected edges in the input
+graphs.  No need to do that math though: nclusterbox can be called
+with the --pa option.  It additionally shows the areas of the
+patterns.  Each community here involves only class hours, one teacher
+and children of a single class.  All its children actually, according
+to how many distinct input elements end with ":1B" and ":3A":
+
+$ grep -o '[^ ]*:1B' primaryschool-every-2-hours | sort -u | wc -l
+25
+
+$ grep -o '[^ ]*:3A' primaryschool-every-2-hours | sort -u | wc -l
+23
+
+In any dimension of any output pattern, the elements are in ascending
+order of density of the related tensor slices.  We can check that for
+the two-hour intervals, by computing how many contacts per interval:
+
+$ cut -d ' ' -f 1 primaryschool-every-2-hours | sort | uniq -c | sort -n
+   1286 8
+   1728 32
+   1819 40
+   1868 16
+   1950 38
+   2002 14
+   2129 12
+   2242 36
+   2613 34
+   3167 10
+
+So far, we apparently only have time to interpret two patterns.  If
+that is a hard constraint, the --mss option should specify it:
+
+$ nclusterbox -bc 2 --ps --mss 2 primaryschool-every-2-hours | cut -d ' ' -f 1,3-7
+32,40,16,38,14,34,10 1800:3A,1744:3B,1738:3A,1820:3A,1737:3A,1723:3A,1580:3B,1564:3B,1741:3A,1709:Teachers,1712:3B,1570:3B,1809:3A,1562:3B,1746:Teachers,1731:3B,1782:3A,1574:3B,1685:3B,1707:3B,1567:3B,1801:3A,1727:3B,1714:3A,1748:3A,1720:3A,1555:3B,1763:3A,1859:3A,1594:3B,1843:3A,1722:3A,1572:3B,1909:3A,1838:3A,1719:3A,1560:3B,1795:3A,1558:3B,1552:3B,1833:3A,1700:3B,1780:3A,1579:3B,1822:3A,1551:3B 0.423879 : 7 46
+8,32,40,38,14,34,10 1682:1B,1687:1B,1681:1B,1779:1B,1661:1B,1670:1B,1680:1B,1663:1B,1920:1B,1656:1B,1908:1B,1696:1B,1674:1B,1745:Teachers,1664:1B,1688:1B,1698:1B,1912:1B,1684:1B,1695:1B,1765:1B,1665:1B,1666:1B,1675:1B,1673:1B,1697:1B 0.694505 : 7 26
+
+The first output community is news!  It involves only class hours and
+almost two whole classes of a same age, with their teachers.  In fact,
+among the 3A and 3B classes, only 1735:3B is missing.  Let us list the
+intervals during which the contacts with 1735:3B were collected:
+
+$ grep -w 1735:3B primaryschool-every-2-hours | cut -d ' ' -f 1 | sort -un
+8
+10
+14
+16
+
+Apparently, 1735:3B only showed up on Thursday.  That explains its
+absence from the new first community.  But why a new first community?
+It less accurately sums up the edges it covers than smaller and denser
+communities output without --mss.  However, given the bound the option
+enforces, some of those communities must be left out and the new first
+community had better be selected: it tells more of the tensor at once.
+
+
+*** SELECTING AND RESELECTING ***
+
+With large tensors, searching for patterns is usually what takes most
+of the time.  Not the final selection of the summary.  To realize that
+and help us be patient, the --verbose (-v) option regularly shows what
+nclusterbox does.  During the search of patterns, it gives how many
+searches are still to start.  Let us be updated every 0.1 second:
+
+$ nclusterbox -bo summary --ps -c 2 -v .1 primaryschool-every-2-hours
+Parsing Boolean tensor: 20804/291610 edges with nonzero membership degrees.
+Shifting tensor: done.
+Getting initial patterns: done.
+Modifying patterns: 24 patterns with locally maximal explanatory powers.
+Reducing fuzzy tensor to elements in patterns: 272610 tuples.
+Selecting patterns: 17 patterns selected.
+
+When we decided to interpret at most two communities, the same
+searches provided the same communities, the "24 patterns" --verbose
+(-v) reported above.  Searching them again and again is a waste of
+time.  To keep them all, in a new file named "candidates" in the
+working directory, let us ask for no selection with the --ns option:
+
+$ nclusterbox -bo candidates --ps -c 2 -v .1 --ns primaryschool-every-2-hours
+Parsing Boolean tensor: 20804/291610 edges with nonzero membership degrees.
+Shifting tensor: done.
+Getting initial patterns: done.
+Modifying patterns: 24 patterns with locally maximal explanatory powers.
+
+The file lists the 24 communities in no particular order.  Let us pass
+that file (or only its first three fields; the rest is ignored) to the
+--os option.  It asks nclusterbox to only select a subset of the given
+patterns to compose a summary.  A 2-pattern summary with --mss 2:
+
+$ nclusterbox -bc 2 --ps --mss 2 --os candidates primaryschool-every-2-hours | cut -d ' ' -f 1,3-7
+32,40,16,38,14,34,10 1800:3A,1744:3B,1738:3A,1820:3A,1737:3A,1723:3A,1580:3B,1564:3B,1741:3A,1709:Teachers,1712:3B,1570:3B,1809:3A,1562:3B,1746:Teachers,1731:3B,1782:3A,1574:3B,1685:3B,1707:3B,1567:3B,1801:3A,1727:3B,1714:3A,1748:3A,1720:3A,1555:3B,1763:3A,1859:3A,1594:3B,1843:3A,1722:3A,1572:3B,1909:3A,1838:3A,1719:3A,1560:3B,1795:3A,1558:3B,1552:3B,1833:3A,1700:3B,1780:3A,1579:3B,1822:3A,1551:3B 0.423879 : 7 46
+8,32,40,38,14,34,10 1682:1B,1687:1B,1681:1B,1779:1B,1661:1B,1670:1B,1680:1B,1663:1B,1920:1B,1656:1B,1908:1B,1696:1B,1674:1B,1745:Teachers,1664:1B,1688:1B,1698:1B,1912:1B,1684:1B,1695:1B,1765:1B,1665:1B,1666:1B,1675:1B,1673:1B,1697:1B 0.694505 : 7 26
+
+Same summary as before, but with no search of candidates.  Let us now
+compute an unbounded summary, removing --mss, use --pr to append the
+residual sums of squares of the summaries truncated after each
+community, filter the non-redundant information with cut, number the
+communities with nl and finally use less for an interactive analysis:
+
+$ nclusterbox -bc 2 --ps --os candidates --pr primaryschool-every-2-hours | cut -d ' ' -f 1,3-7,9- | nl | less
+
+Every output line ends with a residual sum of squares.  Looking at or
+(better) plotting the sequence shows that adding each of the 14 first
+communities clearly turns the summary more accurate.  The last three
+communities marginally improve it.  Let us leave them uninterpreted.
+
+The first nine communities and the 14th correspond to the ten classes,
+with only class hours and, each time, one different teacher and
+(almost) all the children of a single class.  The communities numbered
+10 to 13 involve only the lunch intervals (12 and 36) and overlapping
+groups of 52 to 61 children certainly eating at the common canteen.
+
+
+*** LET US FINALLY BE CONSCIOUS ***
+
+So far, our searches of communities have started from all the 20,804
+undirected edges, the triples in primaryschool-every-2-hours.  They
+led to the 24 communities in candidates.  With a large tensor, the
+time requirements for many searches may be prohibitive.  Let us ask
+for 10, specifying that number after the --max (-m) option, and only
+find a subset of the 24 communities:
+
+$ nclusterbox -bo candidates --ps -c 2 -v .1 --ns -m 10 primaryschool-every-2-hours
+Parsing Boolean tensor: 20804/291610 edges with nonzero membership degrees.
+Shifting tensor: done.
+Getting initial patterns: done.
+Modifying patterns: 7 patterns with locally maximal explanatory powers.
+
+Here, nclusterbox found 7 of the 24 communities.  Running it again,
+the number may be different.  Indeed, the tensor being Boolean, any
+subset of ten undirected edges has the same probability to seed the
+ten searches.  They may all lead to one same community, to ten
+different communities, or to any number in between.  With a fuzzy
+tensor, an n-tuple associated with a greater membership degree is by
+default preferred as a starting point for a search.
+
+We may explicitly define the initial communities too, on individual
+lines of a file whose path is specified after --patterns (-p).  They
+can be larger than single edges, but, here, let us start the searches
+from the first ten edges in primaryschool-every-2-hours:
+
+$ nclusterbox -bo candidates --ps -c 2 -v .1 --ns -m 10 -p primaryschool-every-2-hours primaryschool-every-2-hours
+Parsing Boolean tensor: 20804/291610 edges with nonzero membership degrees.
+Shifting tensor: done.
+Getting initial patterns: done.
+Modifying patterns: 2 patterns with locally maximal explanatory powers.
+
+To rather start from its last ten edges, tail can output them to a
+pipe and --patterns (-p) read them on the standard input, specified
+with "-", that every option expecting a file in argument understands:
+
+$ tail primaryschool-every-2-hours | nclusterbox -bo candidates --ps -c 2 -v .1 --ns -p - primaryschool-every-2-hours
+Parsing Boolean tensor: 20804/291610 edges with nonzero membership degrees.
+Shifting tensor: done.
+Getting initial patterns: done.
+Modifying patterns: 2 patterns with locally maximal explanatory powers.
+
+Each of our last two executions led to only 2 different communities.
+Such a small number was expected: primaryschool-every-2-hours being
+sorted, ten consecutive lines are not diverse.
+
+
+*** TRADING FREE MEMORY FOR SPEED ***
+
+The searches are deterministic.  Those ending up with a same community
+often follow the same last steps.  That is a waste of time.  With
+option --remember (-r), nclusterbox remembers intermediary patterns
+and aborts a search if it reaches such a pattern.  The option must be
+passed how many GB of main memory nclusterbox is allowed to use,
+overall.  By default, it remembers no intermediary pattern.  In this
+way, time requirements may be prohibitive but memory requirements are
+not, unless the tensor is so huge that it cannot be summarized.
+
+To feel the time gain --remember (-r) enables, let us return to the
+slowest execution so far and use it as reference:
+
+$ /usr/bin/time nclusterbox -bo summary --ps -j 1 primaryschool-every-2-hours
+5.03user 0.00system 0:05.03elapsed 100%CPU (0avgtext+0avgdata 13084maxresident)k
+0inputs+24outputs (0major+2560minor)pagefaults 0swaps
+
+Only 13 MB of RAM were necessary.  Now, let us use up to 0.5 GB:
+
+$ /usr/bin/time nclusterbox -bo summary --ps -j 1 -r .5 primaryschool-every-2-hours
+2.06user 0.04system 0:02.11elapsed 100%CPU (0avgtext+0avgdata 163980maxresident)k
+0inputs+24outputs (0major+40472minor)pagefaults 0swaps
+
+That is 5.03 / 2.11 = 2.4 times faster.  Fewer than 164 MB of main
+memory were used, far from the specified upper bound, 0.5 GB.
+
+Specifying a number between 0 and 1 after --density (-d) alters the
+way the input tensor is stored.  By default, 1 is used.  It minimizes
+the space the tensor takes in main memory.  Let us try the other
+extreme, for a dense storage, and use --verbose (-v):
+
+$ /usr/bin/time nclusterbox -bo summary --ps -j 1 -d 0 -v 1 primaryschool-every-2-hours
+Parsing Boolean tensor: 20804/575990 tuples with nonzero membership degrees.
+Shifting tensor: done.
+Getting initial patterns: done.
+Modifying patterns: 45 patterns with locally maximal explanatory powers.
+Reducing fuzzy tensor to elements in patterns: 357210 tuples.
+Selecting patterns: 23 patterns selected.
+3.35user 0.00system 0:03.36elapsed 100%CPU (0avgtext+0avgdata 13420maxresident)k
+0inputs+24outputs (0major+2500minor)pagefaults 0swaps
+
+A (5.03 - 3.36) / 5.03 = 33% time improvement... and no space penalty!
+The reason is that the --density (-d) option only deals with the input
+tensor that, even stored in a dense way, here takes less space than
+the tensor reduced to the elements involved in the candidate patterns.
+The latter tensor replaces the former for the selection of the summary
+and always covers fewer tuples: "357210 tuples" here (against "575990
+tuples" for the input tensor).  However, each of them is associated
+with three 32-bit integers, against one bit for the dense storage (in
+bitsets) of a Boolean input tensor.  Having the selection step
+responsible for the memory peak is unusual.  Sparse tensors with a
+large largest dimension occupy far more space if stored in a dense way
+and their reduced versions are often much smaller.
+
+Finally, let us remember that our last commands, with -j 1 (one single
+thread) and without --communities (-c), made little sense.  We ran
+them to feel every performance improvement.  Even not using the --max
+(-m) option (hence, 20,804 searches), a reasonable call of nclusterbox
+here summarizes primaryschool-every-2-hours in a quarter of a second:
+
+$ /usr/bin/time nclusterbox -bo summary -c 2 -r 1 -d 0 primaryschool-every-2-hours
+1.28user 0.15system 0:00.25elapsed 564%CPU (0avgtext+0avgdata 239264maxresident)k
+0inputs+16outputs (0major+60563minor)pagefaults 0swaps
+
+That's all folks!  Well, not really.  For details, look at the README.
