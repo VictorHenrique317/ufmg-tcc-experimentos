@@ -28,7 +28,11 @@ class ExperimentState:
     graph: Optional[nx.Graph] = field(default=None, repr=False)
     ground_truth: Optional[List[Set[int]]] = field(default=None, repr=False)
     detected_communities: Optional[List[List[int]]] = field(default=None, repr=False)
-    metrics: Optional[List[float]] = field(default=None)
+    
+    # Métricas de Avaliação
+    num_detected_communities: Optional[int] = field(default=None)
+    mean_jaccard: Optional[float] = field(default=None)
+    top_k_mean_jaccard: Optional[float] = field(default=None)
 
     def to_dict(self) -> Dict[str, Any]:
         """Retorna um sumário do estado (sem o grafo completo)."""
@@ -42,5 +46,9 @@ class ExperimentState:
                 "algorithm": self.community_detection_algorithm,
                 "timeout": self.timeout
             },
-            "metrics": self.metrics
+            "metrics": {
+                "num_detected_communities": self.num_detected_communities,
+                "mean_jaccard": self.mean_jaccard,
+                "top_k_mean_jaccard": self.top_k_mean_jaccard
+            }
         }

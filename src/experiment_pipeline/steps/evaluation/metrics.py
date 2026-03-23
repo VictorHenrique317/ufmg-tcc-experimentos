@@ -10,11 +10,9 @@ class MetricsStep(PipelineStep):
 
     def run(self, state: ExperimentState) -> ExperimentState:
         """
-        Calcula o índice de Jaccard para cada comunidade detectada em relação à 
-        melhor correspondência na Ground Truth.
+        Calcula métricas de avaliação agregadas (Jaccard) e as armazena no estado.
         """
-        if state.detected_communities is None or state.ground_truth is None:
-            state.metrics = []
+        if not state.detected_communities or not state.ground_truth:
             return state
 
         scores = []
@@ -23,8 +21,20 @@ class MetricsStep(PipelineStep):
             # Para cada comunidade detectada, encontra o maior Jaccard na GT
             best_score = max((self.jaccard_index(det_set, gt_comm) for gt_comm in state.ground_truth), default=0.0)
             scores.append(float(best_score))
-            
-        state.metrics = scores
+        
+        if not scores:
+            return state
+
+        # Calcular métricas agregadas
+        state.num_detected_communities = len(scores)
+        state.mean_jaccard = np.mean(scores)
+        
+        # Calcular a média do top-k
+        k = state.number_of_ground_truth_communities
+        scores.sort(reverse=True)
+        top_k_scores = scores[:k]
+        state.top_k_mean_jaccard = np.mean(top_k_scores)
+        
         return state
 
     def jaccard_index(self, set_a: Set[int], set_b: Set[int]) -> float:

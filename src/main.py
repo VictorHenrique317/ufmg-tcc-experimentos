@@ -41,9 +41,12 @@ def main():
     print("="*60)
     for res in results:
         print(f"Experimento: {res.name}")
-        print(f"  Métricas (Jaccard por comunidade): {res.metrics}")
-        if res.metrics:
-            print(f"  Média: {sum(res.metrics)/len(res.metrics):.4f}")
+        if res.num_detected_communities is not None:
+            print(f"  Comunidades Detectadas: {res.num_detected_communities}")
+            print(f"  Média Jaccard: {res.mean_jaccard:.4f}")
+            print(f"  Média Top-{res.number_of_ground_truth_communities} Jaccard: {res.top_k_mean_jaccard:.4f}")
+        else:
+            print("  Nenhuma métrica calculada (nenhuma comunidade detectada).")
         print("-" * 30)
 
 if __name__ == "__main__":
