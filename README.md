@@ -7,7 +7,13 @@ This project is an experimental laboratory designed to compare the resilience of
 ### Prerequisites
 - Python 3.12+
 - [Poetry](https://python-poetry.org/docs/#installation)
-- (Optional) `nclusterbox` binary installed in your PATH to run nclusterbox experiments.
+
+For nclusterbox:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y clang libboost-dev libboost-program-options-dev libjemalloc-dev help2man
+```
 
 ### Installation
 
