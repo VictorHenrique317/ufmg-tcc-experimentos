@@ -45,6 +45,8 @@ def main():
             print(f"  Comunidades Detectadas: {res.num_detected_communities}")
             print(f"  Média Jaccard: {res.mean_jaccard:.4f}")
             print(f"  Média Top-{res.number_of_ground_truth_communities} Jaccard: {res.top_k_mean_jaccard:.4f}")
+            if res.detection_time is not None:
+                print(f"  Tempo de Detecção: {res.detection_time:.4f} segundos")
         else:
             print("  Nenhuma métrica calculada (nenhuma comunidade detectada).")
         print("-" * 30)

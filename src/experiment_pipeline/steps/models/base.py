@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import networkx as nx
+import time
 from typing import List, Set
 
 from src.experiment_pipeline.steps.pipeline_step import PipelineStep
@@ -25,6 +26,11 @@ class BaseDetector(PipelineStep):
         if state.graph is None:
             raise ValueError("Grafo não encontrado no estado.")
             
-        communities_sets = self.fit(state.graph).get_communities()
-        state.detected_communities = [list(c) for c in communities_sets]
+        start_time = time.time()
+        # Pass seed and timeout directly to fit, allowing specific detectors to use them
+        self.fit(state.graph, seed=state.random_seed, timeout=state.timeout)
+        state.detected_communities = [list(c) for c in self.get_communities()]
+        end_time = time.time()
+        state.detection_time = end_time - start_time
+        
         return state

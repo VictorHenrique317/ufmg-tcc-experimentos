@@ -65,13 +65,7 @@ class NclusterboxDetector(BaseDetector):
                 os.remove(tmp_path)
         return self
 
-    def run(self, state: ExperimentState) -> ExperimentState:
-        if state.community_detection_algorithm != "nclusterbox":
-            return state
-            
-        self.fit(state.graph, timeout=state.timeout)
-        state.detected_communities = [list(c) for c in self.get_communities()]
-        return state
+
 
     def get_communities(self) -> List[Set[int]]:
         return self.communities_

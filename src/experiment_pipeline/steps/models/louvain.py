@@ -26,13 +26,7 @@ class LouvainDetector(BaseDetector):
         self.communities_ = [set(c) for c in comms]
         return self
 
-    def run(self, state: ExperimentState) -> ExperimentState:
-        if state.community_detection_algorithm != "louvain":
-            return state
-            
-        self.fit(state.graph, seed=state.random_seed)
-        state.detected_communities = [list(c) for c in self.get_communities()]
-        return state
+
 
     def get_communities(self) -> List[Set[int]]:
         return self.communities_

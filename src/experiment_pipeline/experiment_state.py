@@ -33,6 +33,7 @@ class ExperimentState:
     num_detected_communities: Optional[int] = field(default=None)
     mean_jaccard: Optional[float] = field(default=None)
     top_k_mean_jaccard: Optional[float] = field(default=None)
+    detection_time: Optional[float] = field(default=None)
 
     def to_dict(self) -> Dict[str, Any]:
         """Retorna um sumário do estado (sem o grafo completo)."""
@@ -49,6 +50,7 @@ class ExperimentState:
             "metrics": {
                 "num_detected_communities": self.num_detected_communities,
                 "mean_jaccard": self.mean_jaccard,
-                "top_k_mean_jaccard": self.top_k_mean_jaccard
+                "top_k_mean_jaccard": self.top_k_mean_jaccard,
+                "detection_time": self.detection_time
             }
         }
