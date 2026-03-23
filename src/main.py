@@ -1,6 +1,8 @@
 import argparse
 import copy
 import numpy as np
+import os
+import json
 from src.experiment_configuration.configuration_reader import ConfigurationReader
 
 def main():
@@ -48,30 +50,40 @@ def main():
             iteration_results.append(final_state)
             
         # 3. Gerar sumário agregado para o experimento
-        summary = {
+        metrics_to_aggregate = {
+            'detection_time': [res.detection_time for res in iteration_results if res.detection_time is not None],
+            'num_detected_communities': [res.num_detected_communities for res in iteration_results if res.num_detected_communities is not None],
+            'mean_jaccard': [res.mean_jaccard for res in iteration_results if res.mean_jaccard is not None],
+            'top_k_mean_jaccard': [res.top_k_mean_jaccard for res in iteration_results if res.top_k_mean_jaccard is not None]
+        }
+
+        report = {}
+        for metric_name, values in metrics_to_aggregate.items():
+            if values:
+                report[metric_name] = {
+                    'mean': np.mean(values),
+                    'median': np.median(values),
+                    'p25': np.percentile(values, 25),
+                    'p75': np.percentile(values, 75),
+                    'std_dev': np.std(values),
+                    'variance': np.var(values)
+                }
+        
+        # Save report.json
+        exp_name_fs = base_state.name.replace(' ', '_').replace('/', '_').replace(':', '')
+        output_dir = os.path.join("results", exp_name_fs)
+        os.makedirs(output_dir, exist_ok=True) # ensure experiment dir exists
+        report_path = os.path.join(output_dir, "report.json")
+        with open(report_path, 'w') as f:
+            json.dump(report, f, indent=4)
+        print(f"\nAggregated report saved to: {report_path}")
+
+        # Store for final summary
+        experiment_summaries.append({
             "name": base_state.name,
             "iterations": base_state.iterations,
-            "number_of_ground_truth_communities": base_state.number_of_ground_truth_communities,
-            "aggregated_metrics": {}
-        }
-        
-        # Collect metrics from all iterations
-        all_mean_jaccards = [res.mean_jaccard for res in iteration_results if res.mean_jaccard is not None]
-        all_top_k_jaccards = [res.top_k_mean_jaccard for res in iteration_results if res.top_k_mean_jaccard is not None]
-        all_detection_times = [res.detection_time for res in iteration_results if res.detection_time is not None]
-        
-        if all_mean_jaccards:
-            summary["aggregated_metrics"]["avg_mean_jaccard"] = np.mean(all_mean_jaccards)
-            summary["aggregated_metrics"]["std_mean_jaccard"] = np.std(all_mean_jaccards)
-            
-        if all_top_k_jaccards:
-            summary["aggregated_metrics"]["avg_top_k_mean_jaccard"] = np.mean(all_top_k_jaccards)
-            summary["aggregated_metrics"]["std_top_k_mean_jaccard"] = np.std(all_top_k_jaccards)
-            
-        if all_detection_times:
-            summary["aggregated_metrics"]["avg_detection_time"] = np.mean(all_detection_times)
-
-        experiment_summaries.append(summary)
+            "report": report
+        })
         
     # 4. Mostrar sumário final
     print("\n" + "="*60)
@@ -79,13 +91,13 @@ def main():
     print("="*60)
     for summary in experiment_summaries:
         print(f"Experiment: {summary['name']} ({summary['iterations']} iterations)")
-        metrics = summary.get("aggregated_metrics", {})
-        if metrics:
-            k = summary['number_of_ground_truth_communities']
-            print(f"  Avg. Mean Jaccard: {metrics.get('avg_mean_jaccard', 0.0):.4f} (std: {metrics.get('std_mean_jaccard', 0.0):.4f})")
-            print(f"  Avg. Top-{k} Jaccard: {metrics.get('avg_top_k_mean_jaccard', 0.0):.4f} (std: {metrics.get('std_top_k_mean_jaccard', 0.0):.4f})")
-            if 'avg_detection_time' in metrics:
-                print(f"  Avg. Detection Time: {metrics.get('avg_detection_time', 0.0):.4f} seconds")
+        report = summary.get("report", {})
+        if report:
+            for metric_name, stats in report.items():
+                print(f"  Metric: {metric_name}")
+                print(f"    - Mean: {stats['mean']:.4f}, Median: {stats['median']:.4f}")
+                print(f"    - Std Dev: {stats['std_dev']:.4f}, Variance: {stats['variance']:.4f}")
+                print(f"    - 25th percentile: {stats['p25']:.4f}, 75th percentile: {stats['p75']:.4f}")
         else:
             print("  No metrics were calculated for this experiment.")
         print("-" * 30)

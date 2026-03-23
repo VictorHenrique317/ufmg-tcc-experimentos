@@ -61,8 +61,6 @@ class ExperimentPipeline:
             config = {}
             step_output = {
                 "num_detected_communities": state.num_detected_communities,
-                "mean_jaccard": state.mean_jaccard,
-                "top_k_mean_jaccard": state.top_k_mean_jaccard,
                 "detection_time": state.detection_time,
                 "raw_jaccard_scores": state.raw_jaccard_scores
             }
