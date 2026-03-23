@@ -5,7 +5,7 @@ from typing import List
 
 from src.experiment_pipeline.steps.pipeline_step import PipelineStep
 from src.experiment_pipeline.experiment_state import ExperimentState
-from src.experiment_pipeline.step_order import StepOrder
+from src.experiment_pipeline.step_type import StepType # Updated import
 from src.experiment_pipeline.steps.models.base import BaseDetector
 
 
@@ -19,8 +19,9 @@ class ExperimentPipeline:
 
     def _save_step_result(self, state: ExperimentState, step: PipelineStep):
         """Saves the result of a pipeline step to a file."""
-        step_order_number = StepOrder.get_order_number(step.name)
-        step_name_fs = f"{step_order_number}_{step.name.replace(' ', '_').lower()}"
+        step_type = StepType.from_step_name(step.name)
+        step_order_number = step_type.order_number
+        step_name_fs = f"{step_order_number}_{step_type.step_name.replace(' ', '_').lower()}"
         output_dir = os.path.join("results", step_name_fs)
         os.makedirs(output_dir, exist_ok=True)
         
@@ -30,35 +31,32 @@ class ExperimentPipeline:
         config = {}
         step_output = {}
         
-        if step.name == "Graph Generation":
+        if step.name == StepType.GRAPH_GENERATION.step_name:
             config = {
                 "random_seed": state.random_seed,
                 "number_of_vertices": state.number_of_vertices,
                 "number_of_ground_truth_communities": state.number_of_ground_truth_communities
             }
-            if state.graph:
-                step_output['graph'] = nx.node_link_data(state.graph)
-            if state.ground_truth:
-                step_output['ground_truth'] = [list(c) for c in state.ground_truth]
         
-        elif step.name == "Noise Injector":
+            step_output['graph'] = nx.node_link_data(state.graph)
+            step_output['ground_truth'] = [list(c) for c in state.ground_truth] if state.ground_truth else None
+        
+        elif step.name == StepType.NOISE_INJECTION.step_name:
             config = {
                 "number_of_correct_observations": state.number_of_correct_observations
             }
-            if state.graph:
-                step_output['weighted_graph'] = nx.node_link_data(state.graph)
+            
+            step_output['weighted_graph'] = nx.node_link_data(state.graph)
 
-        elif step.name == "Community Detector":
+        elif step.name == StepType.COMMUNITY_DETECTOR.step_name:
             config = {
                 "algorithm": state.community_detection_algorithm,
                 "timeout": state.timeout
             }
-            if state.detected_communities is not None:
-                step_output['detected_communities'] = state.detected_communities
-            if state.detection_time is not None:
-                step_output['detection_time'] = state.detection_time
+            step_output['detected_communities'] = state.detected_communities
+            step_output['detection_time'] = state.detection_time
                 
-        elif step.name == "Evaluation Metrics":
+        elif step.name == StepType.EVALUATION_METRICS.step_name:
             config = {}
             step_output = {
                 "num_detected_communities": state.num_detected_communities,
